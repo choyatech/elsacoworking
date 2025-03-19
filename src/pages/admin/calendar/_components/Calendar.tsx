@@ -16,6 +16,7 @@ export default function Calendar() {
   const [events, setEvents] = useState<any[]>([]);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const eventDialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -38,6 +39,10 @@ export default function Calendar() {
         console.error(error);
       }
     };
+    fetchEvents();
+  }, [events]);
+
+  useEffect(() => {
     const fetchClients = async () => {
       try {
         await databases
@@ -54,9 +59,8 @@ export default function Calendar() {
         console.error(error);
       }
     };
-    fetchEvents();
     fetchClients();
-  }, [events]);
+  }, []);
 
   const createEvent = async (eventInfo: any) => {
     if (selectedEvent) {
@@ -85,15 +89,16 @@ export default function Calendar() {
         setColor("#cccccc");
       }
     }
+    eventDialogRef.current?.close();
   };
 
   const handleSelect = (selectInfo: any) => {
+    eventDialogRef.current?.showModal();
     setSelectedEvent(selectInfo);
   };
 
   const handleEventClick = (clickInfo: any) => {
-    setEventToDelete(clickInfo.event.$id);
-    dialogRef.current?.showModal();
+    eventDialogRef.current?.showModal();
   };
 
   const deleteEvent = (eventId: string) => {
@@ -123,71 +128,12 @@ export default function Calendar() {
   const cancelDelete = () => {
     setEventToDelete(null);
     dialogRef.current?.close();
+    eventDialogRef.current?.close();
   };
 
   return (
     <div className="flex gap-8">
       <aside className="w-1/3">
-        <div className="border border-gray-200 p-4">
-          <h3 className="text-lg font-light mb-4 text-gray-800">
-            Agregar Evento
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-600">Cliente</label>
-              <select
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                className="mt-1 outline-none border p-2 block w-full border-gray-200 focus:border-gray-400 focus:ring-0 rounded-none"
-              >
-                <option disabled selected>
-                  Seleccione un cliente
-                </option>
-                {clients.map(client => (
-                  <option
-                    key={client.$id}
-                    value={`${client.name} ${client.lastname}`}
-                  >
-                    {`${client.name} ${client.lastname}`}
-                  </option>
-                ))}
-              </select>
-              {/* <input
-                type="text"
-                name="title"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                className="mt-1 outline-none border p-2 block w-full border-gray-200 focus:border-gray-400 focus:ring-0 rounded-none"
-              /> */}
-              <label className="block text-sm text-gray-600 mt-3">
-                Hora de la cita
-              </label>
-              <input
-                type="time"
-                value={time}
-                onChange={e => setTime(e.target.value)}
-                className="mt-1 outline-none border p-2 block w-full border-gray-200 focus:border-gray-400 focus:ring-0 rounded-none"
-              />
-              <label className="block text-sm text-gray-600 mt-4">Color</label>
-              <input
-                type="color"
-                name="color"
-                value={color}
-                onChange={e => setColor(e.target.value)}
-                className="mt-1 outline-none border-none block w-full h-10 border-gray-200 focus:border-gray-400 focus:ring-0 rounded-none"
-              />
-            </div>
-            <button
-              type="button"
-              className="w-full bg-gray-800 text-white py-2 px-4 hover:bg-gray-900 transition-colors"
-              onClick={() => createEvent({ title, time, color })}
-              disabled={!selectedEvent || !title}
-            >
-              Agregar Evento
-            </button>
-          </div>
-        </div>
-
         <div className="border border-gray-200 p-4 mt-4">
           <h3 className="text-lg font-light mb-4 text-gray-800">
             Eventos del Mes
@@ -263,6 +209,75 @@ export default function Calendar() {
           >
             Eliminar
           </button>
+        </div>
+      </dialog>
+      <dialog
+        ref={eventDialogRef}
+        className="p-6 lg:min-w-[600px] rounded-lg shadow-lg"
+      >
+        <div className="flex flex-col">
+          <main>
+            <h3 className="text-lg font-light mb-4 text-gray-800">
+              Agregar Evento
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-600">Cliente</label>
+                <select
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  className="mt-1 outline-none border p-2 block w-full border-gray-200 focus:border-gray-400 focus:ring-0 rounded-none"
+                >
+                  <option disabled selected>
+                    Seleccione un cliente
+                  </option>
+                  {clients.map(client => (
+                    <option
+                      key={client.$id}
+                      value={`${client.name} ${client.lastname}`}
+                    >
+                      {`${client.name} ${client.lastname}`}
+                    </option>
+                  ))}
+                </select>
+                <label className="block text-sm text-gray-600 mt-3">
+                  Hora de la cita
+                </label>
+                <input
+                  type="time"
+                  value={time}
+                  onChange={e => setTime(e.target.value)}
+                  className="mt-1 outline-none border p-2 block w-full border-gray-200 focus:border-gray-400 focus:ring-0 rounded-none"
+                />
+                <label className="block text-sm text-gray-600 mt-4">
+                  Color
+                </label>
+                <input
+                  type="color"
+                  name="color"
+                  value={color}
+                  onChange={e => setColor(e.target.value)}
+                  className="mt-1 outline-none border-none block w-full h-10 border-gray-200 focus:border-gray-400 focus:ring-0 rounded-none"
+                />
+              </div>
+            </div>
+          </main>
+          <div className="flex justify-end gap-4 mt-auto pt-6">
+            <button
+              onClick={cancelDelete}
+              className="px-4 py-2 w-full border text-gray-600 hover:text-gray-800"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="w-full bg-gray-800 text-white py-2 px-4 hover:bg-gray-900 transition-colors"
+              onClick={() => createEvent({ title, time, color })}
+              disabled={!selectedEvent || !title}
+            >
+              Agregar Evento
+            </button>
+          </div>
         </div>
       </dialog>
     </div>
