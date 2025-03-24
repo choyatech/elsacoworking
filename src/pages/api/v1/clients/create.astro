@@ -1,0 +1,32 @@
+---
+import { databases } from "@/src/lib/appwrite";
+import { ID } from "node-appwrite";
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const data = {
+    name: formData.get("name"),
+    lastname: formData.get("lastname"),
+    state: formData.get("state"),
+    township: formData.get("township"),
+    plan: formData.get("plan"),
+    mode: formData.get("mode"),
+    contact_type: formData.get("contact_type"),
+    contact_info: formData.get("contact_info"),
+    isClient: true,
+  };
+
+  try {
+    const response = await databases.createDocument(
+      import.meta.env.PUBLIC_APPWRITE_DB,
+      import.meta.env.PUBLIC_APPWRITE_CLIENTS,
+      ID.unique(),
+      data
+    );
+    console.log(response);
+  } catch (error) {
+  } finally {
+    return Astro.redirect("/admin/clients");
+  }
+}
+---

@@ -20,6 +20,16 @@ console.log(clients);
     class="flex flex-col gap-4 min-h-[85vh] p-4 md:w-8/12 lg:w-6/12 mx-auto"
   >
     <h2 class="text-2xl text-center py-6">Clientes</h2>
+    <div class="flex gap-4 justify-center">
+      <a
+        href="/admin/clients/new"
+        class="inline-flex ms-auto items-center px-4 py-2 bg-green-400 hover:bg-green-500 text-sm font-medium rounded-md text-white"
+      >
+        <i class="fas fa-plus mr-2"></i>
+        Nuevo Cliente
+      </a>
+    </div>
+
     {
       clients.length > 0 ? (
         clients.map(client => <ClientCard client={client} />)
