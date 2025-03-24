@@ -2,7 +2,7 @@ import { useState, type SyntheticEvent } from "react";
 import { ID } from "appwrite";
 import { Button } from "../core/components/button";
 import { databases } from "../lib/appwrite";
-import { Editor } from "@/src/blog/Editor";
+import { CustomEditor } from "@/src/blog/Editor";
 import { marked } from "marked";
 
 export const FormPost = () => {
@@ -95,7 +95,7 @@ export const FormPost = () => {
           Contenido
         </label>
         <div className="mt-1  block w-full border-gray-200 rounded-lg text-sm  disabled:opacity-50 disabled:pointer-events-none  border border-gray focus:outline-none px-12 py-4">
-          <Editor setContent={setContent} />
+          <CustomEditor />
         </div>
       </div>
 
