@@ -20,6 +20,28 @@ import { DropzoneComponent } from "./Dropzone";
         </h2>
         <p class="text-gray-500 mt-1">{client.email}</p>
       </div>
+      {controls.isPending === false  && (
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-4">
+          <p class="font-semibold">Solicitud Pendiente</p>
+          <p class="text-sm">
+            Esta solicitud está pendiente de aprobación. Puede aprobarla o
+            archivarla.
+          </p>
+        </div>
+      )}
+      {
+        client.isClient && (
+          <div class="my-4 flex gap-4 justify-center">
+            <a
+              href={`/admin/clients/payments/${client.$id}`}
+              class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <i class="fas fa-receipt mr-2"></i>
+              Ver Pagos
+            </a>
+          </div>
+        )
+      }
 
       <div class="space-y-6">
         <div class="border-t border-gray-200 pt-6">

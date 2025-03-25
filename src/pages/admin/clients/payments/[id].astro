@@ -1,0 +1,86 @@
+---
+import Layout from "@/src/core/Layout.astro";
+import { databases } from "@/src/lib/appwrite";
+const { id } = Astro.params;
+
+let client;
+try {
+  client = await databases.getDocument(
+    import.meta.env.PUBLIC_APPWRITE_DB,
+    import.meta.env.PUBLIC_APPWRITE_CLIENTS,
+    id as string
+  );
+} catch (error) {
+  return Astro.redirect("/admin/clients");
+}
+---
+
+<Layout>
+  <main class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="bg-white shadow-sm rounded-lg p-8">
+      <div class="text-center mb-8">
+        <div
+          class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center"
+        >
+          <i class="fas fa-user text-gray-400 text-2xl"></i>
+        </div>
+        <h2 class="text-2xl font-semibold text-gray-900">
+          {client.name}
+          {client.lastname}
+        </h2>
+        <p class="text-gray-500 mt-1">{client.email}</p>
+      </div>
+
+      <!-- Payments Section -->
+      <div class="mt-8">
+        <h3 class="text-xl font-semibold mb-4">Pagos</h3>
+        <div class="space-y-4">
+          {
+            client.payments?.map((payment: any) => (
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-4">
+                  <div class="text-gray-600">
+                    {new Date(payment.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    class="text-blue-600 hover:text-blue-800"
+                    onclick={`showImage('${payment.imageUrl}')`}
+                  >
+                    <i class="fas fa-eye" />
+                  </button>
+                  <a
+                    href={payment.imageUrl}
+                    download
+                    class="text-green-600 hover:text-green-800"
+                  >
+                    <i class="fas fa-download" />
+                  </a>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Image Dialog -->
+  <dialog id="imageDialog" class="p-4 rounded-lg shadow-xl">
+    <div class="flex flex-col gap-4">
+      <img
+        id="dialogImage"
+        src=""
+        alt="Payment"
+        class="max-w-full max-h-[80vh]"
+      />
+      <button
+        onclick="closeDialog()"
+        class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+      >
+        Cerrar
+      </button>
+    </div>
+  </dialog>
+</Layout>

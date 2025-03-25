@@ -1,11 +1,12 @@
 ---
 import Layout from "@/src/core/Layout.astro";
 import { DropzoneComponent } from "../_components/Dropzone";
+import CitiesSelect from "@/src/landingPage/componentes/ContactForm/CitiesSelect";
 ---
 
 <Layout>
   <main class="container mx-auto px-4 py-8 max-w-2xl">
-    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+    <div class="rounded-lg p-6">
       <h2 class="text-xl font-medium text-gray-800 mb-6">
         Crear Nuevo Cliente
       </h2>
@@ -55,46 +56,29 @@ import { DropzoneComponent } from "../_components/Dropzone";
         </div>
 
         <!-- Información de Detalles -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="state" class="text-sm text-gray-600">Estado</label>
-            <input
-              type="text"
-              name="state"
-              id="state"
-              class="mt-1 w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-gray-400 transition"
-            />
-          </div>
-          <div>
-            <label for="township" class="text-sm text-gray-600">Municipio</label
-            >
-            <input
-              type="text"
-              name="township"
-              id="township"
-              class="mt-1 w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-gray-400 transition"
-            />
-          </div>
-        </div>
+        <CitiesSelect isDark={false} client:load />
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label for="plan" class="text-sm text-gray-600">Plan</label>
-            <input
-              type="text"
+            <select
               name="plan"
-              id="plan"
               class="mt-1 w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-gray-400 transition"
-            />
+            >
+              <option>Básico</option>
+              <option>Premium</option>
+              <option>Pro</option>
+            </select>
           </div>
           <div>
             <label for="mode" class="text-sm text-gray-600">Modalidad</label>
-            <input
-              type="text"
+            <select
               name="mode"
-              id="mode"
               class="mt-1 w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-gray-400 transition"
-            />
+            >
+              <option>Presencial</option>
+              <option>Virtual</option>
+            </select>
           </div>
         </div>
 
@@ -103,12 +87,14 @@ import { DropzoneComponent } from "../_components/Dropzone";
             <label for="contact_type" class="text-sm text-gray-600">
               Tipo de Contacto
             </label>
-            <input
-              type="text"
+            <select
               name="contact_type"
-              id="contact_type"
               class="mt-1 w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-gray-400 transition"
-            />
+            >
+              <option>Correo Electrónico</option>
+              <option>Teléfono</option>
+              <option>WhatsApp</option>
+            </select>
           </div>
           <div>
             <label for="contact_info" class="text-sm text-gray-600">
