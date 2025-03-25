@@ -1,6 +1,7 @@
 ---
 import Layout from "@/src/core/Layout.astro";
 import { databases } from "@/src/lib/appwrite";
+import { DropzoneComponent } from "../../_components/Dropzone";
 const { id } = Astro.params;
 
 let client;
@@ -17,70 +18,106 @@ try {
 
 <Layout>
   <main class="container mx-auto px-4 py-8 max-w-3xl">
-    <div class="bg-white shadow-sm rounded-lg p-8">
-      <div class="text-center mb-8">
-        <div
-          class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center"
-        >
-          <i class="fas fa-user text-gray-400 text-2xl"></i>
-        </div>
-        <h2 class="text-2xl font-semibold text-gray-900">
+    <div class="bg-white rounded-lg p-8">
+      <div class="text-center mb-3 border-b pb-6">
+        <h2 class="text-2xl font-light text-gray-900">
           {client.name}
           {client.lastname}
         </h2>
-        <p class="text-gray-500 mt-1">{client.email}</p>
+        <div class="flex">
+          <a
+            href={"/admin/clients"}
+            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            <i class="fas fa-arrow-left mr-2"></i>
+            Volver
+          </a>
+        </div>
       </div>
 
+      <form
+        action={`/api/v1/payments/upload/${id}`}
+        method="post"
+        enctype="multipart/form-data"
+        class="border-b pb-6"
+      >
+        <div class="flex flex-col">
+          <h3 class="text-sm font-light text-gray-600 mb-2">
+            Subir Archivos de pagos
+          </h3>
+          <DropzoneComponent client:load />
+          <button
+            type="submit"
+            class="inline-flex ms-auto items-center px-4 py-2 border text-gray-600 hover:bg-gray-50 text-sm font-light rounded mt-2"
+          >
+            <i class="fas fa-plus mr-2"></i>Subir
+          </button>
+        </div>
+      </form>
+
       <!-- Payments Section -->
-      <div class="mt-8">
-        <h3 class="text-xl font-semibold mb-4">Pagos</h3>
-        <div class="space-y-4">
+      <div class="mt-6">
+        <h3 class="text-xl font-light mb-4">Pagos</h3>
+        <div class="space-y-2">
           {
-            client.payments?.map((payment: any) => (
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div class="flex items-center gap-4">
-                  <div class="text-gray-600">
-                    {new Date(payment.createdAt).toLocaleDateString()}
+            client.payments.map((file: string) => {
+              const imageUrl = `https://cloud.appwrite.io/v1/storage/buckets/${import.meta.env.PUBLIC_APPWRITE_STORAGE}/files/${file}/view?project=${import.meta.env.PUBLIC_APPWRITE_PROJECT}`;
+              const downloadUrl = `https://cloud.appwrite.io/v1/storage/buckets/${import.meta.env.PUBLIC_APPWRITE_STORAGE}/files/${file}/download?project=${import.meta.env.PUBLIC_APPWRITE_PROJECT}`;
+              return (
+                <div class="flex items-center justify-between p-3 border rounded hover:bg-gray-50 transition-colors">
+                  <div class="flex items-center gap-4">
+                    <img
+                      src={imageUrl}
+                      onerror="this.src='/preview.png'"
+                      alt="Documento"
+                      class="w-12 h-12 object-cover rounded cursor-pointer"
+                      onclick={`document.getElementById('dialog-${file}').showModal()`}
+                    />
+                    <span class="text-sm text-gray-600">
+                      Documento_{file.slice(0, 8)}
+                    </span>
                   </div>
-                </div>
-                <div class="flex gap-2">
-                  <button
-                    class="text-blue-600 hover:text-blue-800"
-                    onclick={`showImage('${payment.imageUrl}')`}
+                  <div class="flex gap-4">
+                    <a
+                      href={downloadUrl}
+                      download
+                      class="text-gray-400 hover:text-gray-600"
+                      title="Descargar"
+                    >
+                      <i class="fas fa-download" />
+                    </a>
+                    <button
+                      onclick={`document.getElementById('dialog-${file}').showModal()`}
+                      class="text-gray-400 hover:text-gray-600"
+                    >
+                      <i class="fas fa-expand" />
+                    </button>
+                  </div>
+                  <dialog
+                    id={`dialog-${file}`}
+                    class="p-2 rounded max-w-2xl w-full"
                   >
-                    <i class="fas fa-eye" />
-                  </button>
-                  <a
-                    href={payment.imageUrl}
-                    download
-                    class="text-green-600 hover:text-green-800"
-                  >
-                    <i class="fas fa-download" />
-                  </a>
+                    <div class="relative bg-white">
+                      <img
+                        src={imageUrl}
+                        alt="Documento"
+                        onerror="this.src='/preview.png'"
+                        class="w-full h-auto rounded"
+                      />
+                      <button
+                        onclick={`document.getElementById('dialog-${file}').close()`}
+                        class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                      >
+                        <i class="fas fa-times text-xl" />
+                      </button>
+                    </div>
+                  </dialog>
                 </div>
-              </div>
-            ))
+              );
+            })
           }
         </div>
       </div>
     </div>
   </main>
-
-  <!-- Image Dialog -->
-  <dialog id="imageDialog" class="p-4 rounded-lg shadow-xl">
-    <div class="flex flex-col gap-4">
-      <img
-        id="dialogImage"
-        src=""
-        alt="Payment"
-        class="max-w-full max-h-[80vh]"
-      />
-      <button
-        onclick="closeDialog()"
-        class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-      >
-        Cerrar
-      </button>
-    </div>
-  </dialog>
 </Layout>
