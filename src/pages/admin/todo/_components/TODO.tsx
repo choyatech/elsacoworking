@@ -1,25 +1,13 @@
 import { useState } from "react";
 import { databases } from "@/src/lib/appwrite";
+import { ID } from "node-appwrite";
 import { motion, AnimatePresence } from "motion/react";
 
 export const TODO = ({ tasks }: { tasks: any }) => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
   return (
     <AnimatePresence>
       <ul className="mt-4">
-        <motion.li className="mb-4">
-          {showCreateForm ? (
-            <CreateTodoForm setShowCreateForm={setShowCreateForm} />
-          ) : (
-            <button
-              className="w-full py-2 px-4 bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b] transition-colors font-medium flex items-center justify-center gap-2 text-sm"
-              onClick={() => setShowCreateForm(!showCreateForm)}
-            >
-              <i className="fas fa-plus"></i>
-              Agregar nueva tarea
-            </button>
-          )}
-        </motion.li>
+        <CreateTodoForm />
         {tasks.map((task: any) => (
           <TodoItem key={task["$id"]} task={task} />
         ))}
@@ -64,70 +52,100 @@ const TodoItem = ({ task }: { task: any }) => {
   };
 
   return (
-    <div className="border border-[#d0d7de] rounded-md bg-white mb-3">
-      <div className="p-3">
-        <div className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={() => onCheck()}
-            className="w-4 h-4 rounded border-gray-300"
-          />
-          <h3
-            className={`text-sm font-medium ${
-              isChecked ? "line-through text-[#6e7781]" : "text-[#24292f]"
-            }`}
-          >
-            {task.title}
-          </h3>
-        </div>
-        {showDetails && (
-          <div className="mt-3">
-            <textarea
-              className="w-full p-2 border border-[#d0d7de] rounded-md focus:outline-none  focus:ring-1  min-h-[100px] text-sm"
-              value={tempContent}
-              onChange={handleDescriptionInput}
-              placeholder="Task description..."
+    <AnimatePresence mode="wait">
+      <motion.li
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="border border-[#d0d7de] rounded-md flex flex-col justify-between bg-white mb-3"
+      >
+        <div className="p-3">
+          <div className="flex items-center gap-3">
+            <motion.input
+              whileTap={{ scale: 0.9 }}
+              type="checkbox"
+              checked={isChecked}
+              onChange={() => onCheck()}
+              className="w-4 h-4 rounded border-gray-300"
             />
-            {showSaveButton && (
-              <div className="flex justify-end mt-2">
-                <button
-                  onClick={() => updateTask()}
-                  className="px-3 py-1 text-sm bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b] transition-colors"
-                >
-                  Save Changes
-                </button>
-              </div>
-            )}
+            <motion.h3
+              animate={{ opacity: isChecked ? 0.6 : 1 }}
+              transition={{ duration: 0.2 }}
+              className={`text-sm font-medium ${
+                isChecked ? "line-through text-[#6e7781]" : "text-[#24292f]"
+              }`}
+            >
+              {task.title}
+            </motion.h3>
           </div>
-        )}
-      </div>
-      <div className="flex items-center justify-between px-3 py-2 bg-[#f6f8fa] border-t border-[#d0d7de] rounded-b-md">
-        <span className="text-xs text-[#57606a]">
-          Created: {new Date(task.$createdAt).toLocaleDateString()}
-        </span>
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          className="text-xs text-[#0969da] hover:text-[#0969da]/80 font-medium"
-        >
-          {showDetails ? "Hide" : "Show"} Details
-        </button>
-      </div>
-    </div>
+          <AnimatePresence>
+            {showDetails && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-3 overflow-hidden"
+              >
+                <textarea
+                  className="w-full p-2 border border-[#d0d7de] rounded-md focus:outline-none focus:ring-1 min-h-[100px] text-sm"
+                  value={tempContent}
+                  onChange={handleDescriptionInput}
+                  placeholder="Task description..."
+                />
+                <AnimatePresence>
+                  {showSaveButton && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex justify-end mt-2"
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => updateTask()}
+                        className="px-3 py-1 text-sm bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b] transition-colors"
+                      >
+                        Save Changes
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="flex items-center justify-between px-3 py-2 bg-[#f6f8fa] border-t border-[#d0d7de] rounded-b-md">
+          <span className="text-xs text-[#57606a]">
+            Created: {new Date(task.$createdAt).toLocaleDateString()}
+          </span>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-xs text-[#0969da] hover:text-[#0969da]/80 font-medium"
+          >
+            {showDetails ? "Hide" : "Show"} Details
+          </motion.button>
+        </div>
+      </motion.li>
+    </AnimatePresence>
   );
 };
-const CreateTodoForm = ({ setShowCreateForm }: any) => {
+const CreateTodoForm = () => {
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!title.trim()) return;
 
     await databases.createDocument(
       import.meta.env.PUBLIC_APPWRITE_DB,
       import.meta.env.PUBLIC_APPWRITE_TASKS,
-      crypto.randomUUID(),
+      ID.unique(),
       {
         title,
         content,
@@ -138,38 +156,92 @@ const CreateTodoForm = ({ setShowCreateForm }: any) => {
     setTitle("");
     setContent("");
     setShowCreateForm(false);
+    window.location.reload();
   };
 
   return (
-    <motion.div layout onSubmit={handleSubmit} className="mb-4">
-      <input
-        type="text"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        placeholder="Titulo..."
-        className="w-full p-2 mb-2 border outline-none border-[#d0d7de] rounded-md"
-      />
-      <textarea
-        value={content}
-        onChange={e => setContent(e.target.value)}
-        placeholder="Descripción..."
-        className="w-full p-2 mb-2 border outline-none border-[#d0d7de] rounded-md min-h-[100px]"
-      />
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          className="w-full py-2 px-4  rounded-md border bg-slate-50 hover:bg-slate-100 transition-colors"
-          onClick={() => setShowCreateForm(false)}
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="w-full py-2 px-4 bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b] transition-colors"
-        >
-          Crear Tarea
-        </button>
-      </div>
-    </motion.div>
+    <motion.li
+      className="mb-4"
+      layout
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+    >
+      <AnimatePresence mode="wait">
+        {showCreateForm ? (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{
+              duration: 0.2,
+              ease: "easeOut",
+            }}
+            className="mb-4"
+          >
+            <motion.input
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="Titulo..."
+              className="w-full p-2 mb-2 border outline-none border-[#d0d7de] rounded-md"
+            />
+            <motion.textarea
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              placeholder="Descripción..."
+              className="w-full p-2 mb-2 border outline-none border-[#d0d7de] rounded-md min-h-[100px]"
+            />
+            <motion.div
+              className="flex gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2, delay: 0.2 }}
+            >
+              <motion.button
+                whileHover={{ opacity: 0.8 }}
+                transition={{ duration: 0.2 }}
+                type="submit"
+                className="w-full py-2 px-4 rounded-md border bg-slate-50 hover:bg-slate-100 transition-colors"
+                onClick={() => setShowCreateForm(false)}
+              >
+                Cancelar
+              </motion.button>
+              <motion.button
+                whileHover={{ opacity: 0.8 }}
+                transition={{ duration: 0.2 }}
+                type="submit"
+                className="w-full py-2 px-4 bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b] transition-colors"
+                onClick={() => handleSubmit()}
+              >
+                Crear Tarea
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        ) : (
+          <motion.button
+            key="add-button"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            whileHover={{ opacity: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="w-full py-2 px-4 bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b] transition-colors font-medium flex items-center justify-center gap-2 text-sm"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          >
+            <i className="fas fa-plus"></i>
+            Agregar nueva tarea
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </motion.li>
   );
 };

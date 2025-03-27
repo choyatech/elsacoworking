@@ -2,10 +2,12 @@
 import Layout from "@/src/core/Layout.astro";
 import { databases } from "@/src/lib/appwrite";
 import { TODO } from "./_components/TODO";
+import { Query } from "node-appwrite";
 
 const { documents: tasks } = await databases.listDocuments(
   import.meta.env.PUBLIC_APPWRITE_DB,
-  import.meta.env.PUBLIC_APPWRITE_TASKS
+  import.meta.env.PUBLIC_APPWRITE_TASKS,
+  [Query.orderDesc("$createdAt")]
 );
 ---
 
