@@ -51,6 +51,17 @@ const TodoItem = ({ task }: { task: any }) => {
     setShowSaveButton(false);
   };
 
+  const deleteTask = async () => {
+    if (confirm("¿Estás seguro de que quieres eliminar esta tarea?")) {
+      await databases.deleteDocument(
+        import.meta.env.PUBLIC_APPWRITE_DB,
+        import.meta.env.PUBLIC_APPWRITE_TASKS,
+        task["$id"]
+      );
+      window.location.reload();
+    }
+  };
+
   return (
     <AnimatePresence mode="wait">
       <motion.li
@@ -61,23 +72,25 @@ const TodoItem = ({ task }: { task: any }) => {
         className="border border-[#d0d7de] rounded-md flex flex-col justify-between bg-white mb-3"
       >
         <div className="p-3">
-          <div className="flex items-center gap-3">
-            <motion.input
-              whileTap={{ scale: 0.9 }}
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => onCheck()}
-              className="w-4 h-4 rounded border-gray-300"
-            />
-            <motion.h3
-              animate={{ opacity: isChecked ? 0.6 : 1 }}
-              transition={{ duration: 0.2 }}
-              className={`text-sm font-medium ${
-                isChecked ? "line-through text-[#6e7781]" : "text-[#24292f]"
-              }`}
-            >
-              {task.title}
-            </motion.h3>
+          <div className="flex items-center gap-3 justify-between">
+            <div className="flex items-center gap-3">
+              <motion.input
+                whileTap={{ scale: 0.9 }}
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => onCheck()}
+                className="w-4 h-4 rounded border-gray-300"
+              />
+              <motion.h3
+                animate={{ opacity: isChecked ? 0.6 : 1 }}
+                transition={{ duration: 0.2 }}
+                className={`text-sm font-medium ${
+                  isChecked ? "line-through text-[#6e7781]" : "text-[#24292f]"
+                }`}
+              >
+                {task.title}
+              </motion.h3>
+            </div>
           </div>
           <AnimatePresence>
             {showDetails && (
@@ -121,14 +134,20 @@ const TodoItem = ({ task }: { task: any }) => {
           <span className="text-xs text-[#57606a]">
             Created: {new Date(task.$createdAt).toLocaleDateString()}
           </span>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowDetails(!showDetails)}
-            className="text-xs text-[#0969da] hover:text-[#0969da]/80 font-medium"
-          >
-            {showDetails ? "Hide" : "Show"} Details
-          </motion.button>
+          <div className="flex gap-4">
+            <motion.button
+              onClick={deleteTask}
+              className="text-xs text-[#da1709] hover:text-[#da1709]/80 font-medium"
+            >
+              Eliminar Tarea
+            </motion.button>
+            <motion.button
+              onClick={() => setShowDetails(!showDetails)}
+              className="text-xs text-[#0969da] hover:text-[#0969da]/80 font-medium"
+            >
+              {showDetails ? "Ocultar" : "Mostrar"} Detalles
+            </motion.button>
+          </div>
         </div>
       </motion.li>
     </AnimatePresence>
