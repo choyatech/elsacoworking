@@ -1,7 +1,15 @@
 ---
-const { client, controls = { isPending: false, isArchived: false }, status = "Pendiente", backTo = "/admin", canAddFiles = true } = Astro.props;
+const {
+  client,
+  controls = { isPending: false, isArchived: false },
+  status = "Pendiente",
+  backTo = "/admin",
+  canAddFiles = true,
+  isEditable = false,
+} = Astro.props;
 import Layout from "@/src/core/Layout.astro";
 import { DropzoneComponent } from "./Dropzone";
+import { EditableTextField } from "./EditableTextField";
 
 ---
 
@@ -15,8 +23,18 @@ import { DropzoneComponent } from "./Dropzone";
           <i class="fas fa-user text-gray-400 text-2xl"></i>
         </div>
         <h2 class="text-2xl font-semibold text-gray-900">
-          {client.name}
-          {client.lastname}
+          <EditableTextField
+            value={client.name}
+            elementName="name"
+            clientId={client.$id}
+            client:load
+            />
+            <EditableTextField
+            value={client.lastname}
+            elementName="lastname"
+            clientId={client.$id}
+            client:load
+            />
         </h2>
         <p class="text-gray-500 mt-1">{client.email}</p>
       </div>
@@ -65,34 +83,62 @@ import { DropzoneComponent } from "./Dropzone";
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p class="text-sm text-gray-500">Estado</p>
-              <p class="text-gray-900">{client.state}</p>
+              <EditableTextField
+                value={client.state}
+                elementName="state"
+                clientId={client.$id}
+                client:load
+              />
             </div>
             <div>
               <p class="text-sm text-gray-500">Municipio</p>
-              <p class="text-gray-900">{client.township}</p>
+              <EditableTextField
+                value={client.township}
+                elementName="township"
+                clientId={client.$id}
+                client:load
+              />
             </div>
             <div>
               <p class="text-sm text-gray-500">Plan</p>
-              <p class="text-gray-900">{client.plan}</p>
+              <EditableTextField
+                value={client.plan}
+                elementName="plan"
+                clientId={client.$id}
+                client:load />
             </div>
             <div>
               <p class="text-sm text-gray-500">Modalidad</p>
-              <p class="text-gray-900">{client.mode}</p>
+              <EditableTextField
+                value={client.mode}
+                elementName="mode"
+                clientId={client.$id}
+                client:load/>
             </div>
             <div>
               <p class="text-sm text-gray-500">Tipo de Contacto</p>
-              <p class="text-gray-900">{client.contact_type}</p>
+              <EditableTextField
+                value={client.contact_type}
+                elementName="contact_type"
+                clientId={client.$id}
+                client:load/>
             </div>
             <div>
               <p class="text-sm text-gray-500">Información de Contacto</p>
-              <a
+              <EditableTextField
+                value={client.contact_info}
+                elementName="contact_info"
+                clientId={client.$id}
+                isContactField
+                client:load/>
+              <!-- <a
                 href={client.contact_info.includes("@")
                   ? `mailto:${client.contact_info}`
                   : `tel:${client.contact_info}`}
                 class="text-blue-600 hover:underline"
               >
                 {client.contact_info}
-              </a>
+              </a> -->
             </div>
           </div>
         </div>
