@@ -7,6 +7,7 @@ const { id } = Astro.params;
 if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
 
+  const description = formData.get("description") as string;
   const files = formData.getAll("files");
 
   // Verificar si hay archivos válidos
@@ -18,40 +19,32 @@ if (Astro.request.method === "POST") {
     return Astro.redirect(`/admin/clients/payments/${id}?error=no-files`);
   }
 
-  const paymentsIDs = [];
-
   try {
-    // Obtener el documento actual para acceder a los files existentes
-    const currentDoc = await databases.getDocument(
-      import.meta.env.PUBLIC_APPWRITE_DB,
-      import.meta.env.PUBLIC_APPWRITE_CLIENTS,
-      id as string
+    const fileId = await storage.createFile(
+      import.meta.env.PUBLIC_APPWRITE_STORAGE,
+      ID.unique(),
+      validFiles[0] as File
     );
 
-    // Guardar los files existentes
-    const existingPayments = currentDoc.payments || [];
-
-    // Subir los nuevos archivos
-    for (const file of validFiles) {
-      const fileId = await storage.createFile(
-        import.meta.env.PUBLIC_APPWRITE_STORAGE,
+    if (fileId) {
+      await databases.createDocument(
+        import.meta.env.PUBLIC_APPWRITE_DB,
+        import.meta.env.PUBLIC_APPWRITE_PAYMENTS,
         ID.unique(),
-        file as File
+        {
+          client: id,
+          description: description,
+          image: fileId.$id,
+        }
       );
-
-      paymentsIDs.push(fileId["$id"]);
     }
 
-    // Combinar files existentes con nuevos
-    const allFiles = [...existingPayments, ...paymentsIDs];
-
-    // Actualizar documento con todos los files
     await databases.updateDocument(
       import.meta.env.PUBLIC_APPWRITE_DB,
       import.meta.env.PUBLIC_APPWRITE_CLIENTS,
       id as string,
       {
-        payments: allFiles,
+        lastPayment: new Date().toISOString(),
       }
     );
   } catch (error) {

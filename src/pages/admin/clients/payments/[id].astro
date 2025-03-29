@@ -2,17 +2,31 @@
 import Layout from "@/src/core/Layout.astro";
 import { databases } from "@/src/lib/appwrite";
 import { DropzoneComponent } from "../../_components/Dropzone";
+import { Query } from "node-appwrite";
+import { EditableTextField } from "../../_components/EditableTextField";
 const { id } = Astro.params;
 
 let client;
+let payments = [];
 try {
   client = await databases.getDocument(
     import.meta.env.PUBLIC_APPWRITE_DB,
     import.meta.env.PUBLIC_APPWRITE_CLIENTS,
     id as string
   );
+
+  const { documents: listOfPayments } = await databases.listDocuments(
+    import.meta.env.PUBLIC_APPWRITE_DB,
+    import.meta.env.PUBLIC_APPWRITE_PAYMENTS,
+    [Query.equal("client", id as string)]
+  );
+  console.log(listOfPayments);
+
+  payments = listOfPayments;
 } catch (error) {
-  return Astro.redirect("/admin/clients");
+  console.log(error);
+
+  return Astro.redirect(`/admin/clients/${id}`);
 }
 ---
 
@@ -26,7 +40,7 @@ try {
         </h2>
         <div class="flex">
           <a
-            href={"/admin/clients"}
+            href={`/admin/clients/${id}`}
             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <i class="fas fa-arrow-left mr-2"></i>
@@ -45,10 +59,22 @@ try {
           <h3 class="text-sm font-light text-gray-600 mb-2">
             Subir Archivos de pagos
           </h3>
-          <DropzoneComponent client:load />
+          <DropzoneComponent multiple={false} client:load />
+          <div class="mt-4">
+            <label for="description" class="text-sm text-gray-600"
+              >Descripción</label
+            >
+            <input
+              type="text"
+              name="description"
+              id="description"
+              required
+              class="mt-1 w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-gray-400 transition"
+            />
+          </div>
           <button
             type="submit"
-            class="inline-flex ms-auto items-center px-4 py-2 border text-gray-600 hover:bg-gray-50 text-sm font-light rounded mt-2"
+            class="inline-flex ms-auto items-center px-4 py-2 border text-white transition-all active:scale-95 bg-green-600 hover:bg-green-500 text-sm font-light rounded mt-2"
           >
             <i class="fas fa-plus mr-2"></i>Subir
           </button>
@@ -60,9 +86,9 @@ try {
         <h3 class="text-xl font-light mb-4">Pagos</h3>
         <div class="space-y-2">
           {
-            client.payments.map((file: string) => {
-              const imageUrl = `https://cloud.appwrite.io/v1/storage/buckets/${import.meta.env.PUBLIC_APPWRITE_STORAGE}/files/${file}/view?project=${import.meta.env.PUBLIC_APPWRITE_PROJECT}`;
-              const downloadUrl = `https://cloud.appwrite.io/v1/storage/buckets/${import.meta.env.PUBLIC_APPWRITE_STORAGE}/files/${file}/download?project=${import.meta.env.PUBLIC_APPWRITE_PROJECT}`;
+            payments.map(payment => {
+              const imageUrl = `https://cloud.appwrite.io/v1/storage/buckets/${import.meta.env.PUBLIC_APPWRITE_STORAGE}/files/${payment.image}/view?project=${import.meta.env.PUBLIC_APPWRITE_PROJECT}`;
+              const downloadUrl = `https://cloud.appwrite.io/v1/storage/buckets/${import.meta.env.PUBLIC_APPWRITE_STORAGE}/files/${payment.image}/download?project=${import.meta.env.PUBLIC_APPWRITE_PROJECT}`;
               return (
                 <div class="flex items-center justify-between p-3 border rounded hover:bg-gray-50 transition-colors">
                   <div class="flex items-center gap-4">
@@ -71,11 +97,22 @@ try {
                       onerror="this.src='/preview.png'"
                       alt="Documento"
                       class="w-12 h-12 object-cover rounded cursor-pointer"
-                      onclick={`document.getElementById('dialog-${file}').showModal()`}
+                      onclick={`document.getElementById('dialog-${payment.image}').showModal()`}
                     />
-                    <span class="text-sm text-gray-600">
-                      Documento_{file.slice(0, 8)}
-                    </span>
+                    <div class="flex flex-col">
+                      <span class=" text-gray-600">
+                        <EditableTextField
+                          value={payment.description}
+                          elementName="description"
+                          db={import.meta.env.PUBLIC_APPWRITE_PAYMENTS}
+                          id={payment.$id}
+                          client:load
+                        />
+                      </span>
+                      <span class="text-xs px-1 text-gray-500">
+                        {new Date(payment.$createdAt).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
                   <div class="flex gap-4">
                     <a
@@ -87,14 +124,14 @@ try {
                       <i class="fas fa-download" />
                     </a>
                     <button
-                      onclick={`document.getElementById('dialog-${file}').showModal()`}
+                      onclick={`document.getElementById('dialog-${payment.image}').showModal()`}
                       class="text-gray-400 hover:text-gray-600"
                     >
                       <i class="fas fa-expand" />
                     </button>
                   </div>
                   <dialog
-                    id={`dialog-${file}`}
+                    id={`dialog-${payment.image}`}
                     class="p-2 rounded max-w-2xl w-full"
                   >
                     <div class="relative bg-white">
@@ -105,7 +142,7 @@ try {
                         class="w-full h-auto rounded"
                       />
                       <button
-                        onclick={`document.getElementById('dialog-${file}').close()`}
+                        onclick={`document.getElementById('dialog-${payment.image}').close()`}
                         class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
                       >
                         <i class="fas fa-times text-xl" />

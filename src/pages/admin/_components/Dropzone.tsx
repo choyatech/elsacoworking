@@ -2,7 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import { Dropzone, MIME_TYPES, type FileWithPath } from "@mantine/dropzone";
 import { useState, useEffect, useRef } from "react";
 
-export function DropzoneComponent() {
+export function DropzoneComponent({ multiple = true }: { multiple?: boolean }) {
   const [files, setFiles] = useState<FileWithPath[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -75,6 +75,7 @@ export function DropzoneComponent() {
           MIME_TYPES.heic,
           MIME_TYPES.heif,
         ]}
+        multiple={multiple}
         className="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-gray-400 transition-colors"
       >
         <div className="text-center">

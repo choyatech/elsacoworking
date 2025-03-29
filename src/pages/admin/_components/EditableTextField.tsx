@@ -4,17 +4,19 @@ import { useState, useEffect } from "react";
 interface Props {
   value: string;
   elementName: string;
-  clientId: string;
+  id: string;
   onSave?: (newValue: string) => void;
   className?: string;
+  db?: string;
   isContactField?: boolean;
 }
 
 export const EditableTextField = ({
   value,
   elementName,
-  clientId,
+  id,
   className = "",
+  db = import.meta.env.PUBLIC_APPWRITE_CLIENTS,
   isContactField = false,
 }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -28,8 +30,8 @@ export const EditableTextField = ({
   const handleSave = async () => {
     const res = await databases.updateDocument(
       import.meta.env.PUBLIC_APPWRITE_DB,
-      import.meta.env.PUBLIC_APPWRITE_CLIENTS,
-      clientId,
+      db,
+      id,
       {
         [elementName]: newValue,
       }
@@ -50,6 +52,7 @@ export const EditableTextField = ({
             value={newValue}
             onChange={e => setNewValue(e.target.value)}
             className="bg-white border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:border-gray-400 transition"
+            maxLength={24}
             autoFocus
           />
           <button
