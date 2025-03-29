@@ -38,12 +38,20 @@ import { EditableTextField } from "./EditableTextField";
         </h2>
         <p class="text-gray-500 mt-1">{client.email}</p>
       </div>
-      {controls.isPending === false  && (
-        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-4">
+      {controls.isPending === true  && (
+        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded mb-4">
           <p class="font-semibold">Solicitud Pendiente</p>
           <p class="text-sm">
             Esta solicitud está pendiente de aprobación. Puede aprobarla o
             archivarla.
+          </p>
+        </div>
+      )}
+      {controls.isArchived === true  && (
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-4">
+          <p class="font-semibold">Solicitud Archivada</p>
+          <p class="text-sm">
+            Esta solicitud ha sido archivada. Puede desarchivarla si es necesario.
           </p>
         </div>
       )}
@@ -248,7 +256,7 @@ import { EditableTextField } from "./EditableTextField";
           <i class="fas fa-arrow-left mr-2"></i>
           Volver
         </a>
-        {controls.isPending ? (
+        {controls.isPending && (
           <a
           href={`/api/v1/applications/approve/${client.$id}`}
           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
@@ -263,13 +271,16 @@ import { EditableTextField } from "./EditableTextField";
           <i class="fas fa-archive mr-2"></i>
           Archivar Solicitud
         </a>
-        ):(<a
+        )}
+        {
+          client.isClient && (<a
           href={`/api/v1/clients/archive/${client.$id}`}
           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           <i class="fas fa-archive mr-2"></i>
           Archivar Cliente
-        </a>)}
+        </a>)
+        }
         {controls.isArchived && (
           <a
             href={`/api/v1/applications/unarchive/${client.$id}`}
