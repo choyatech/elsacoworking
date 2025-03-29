@@ -14,6 +14,7 @@ interface ImportMetaEnv {
   readonly PUBLIC_APPWRITE_TASKS: string;
   readonly PUBLIC_APPWRITE_STORAGE_PAYMENTS: string;
   readonly PUBLIC_APPWRITE_PAYMENTS: string;
+  readonly PUBLIC_APPWRITE_NOTIFICATIONS: string;
 }
 
 interface ImportMeta {

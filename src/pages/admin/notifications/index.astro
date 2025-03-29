@@ -1,0 +1,21 @@
+---
+import Layout from "@/src/core/Layout.astro";
+import { Notifications } from "./_components/Notifications";
+import { databases } from "@/src/lib/appwrite";
+
+const { documents: notifications } = await databases.listDocuments(
+  import.meta.env.PUBLIC_APPWRITE_DB,
+  import.meta.env.PUBLIC_APPWRITE_NOTIFICATIONS
+);
+---
+
+<Layout
+  title="Notifications"
+  description="Notifications page"
+  class="bg-gray-100"
+>
+  <main class="md:w-1/3 py-6 h-full mx-auto">
+    <h1 class="text-4xl font-bold mb-4 text-center">Notificaciones</h1>
+    <Notifications notifications={notifications} client:load />
+  </main>
+</Layout>
