@@ -55,8 +55,6 @@ const messaging = new Messaging(client)
 
 export async function sendEmail(subject, html) {
 
-  console.log(import.meta.env.PUBLIC_EMAIL_USER_ID);
-
   const message = await messaging.createEmail(
     ID.unique(),                // messageId (unique)
     subject,        // subject

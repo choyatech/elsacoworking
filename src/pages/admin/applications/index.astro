@@ -11,8 +11,6 @@ const clients = await databases
     [Query.equal("isClient", false), Query.equal("isArchived", false)]
   )
   .then(res => res.documents);
-
-console.log(clients);
 ---
 
 <Layout>

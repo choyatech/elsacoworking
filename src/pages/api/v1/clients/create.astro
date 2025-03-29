@@ -23,8 +23,8 @@ if (Astro.request.method === "POST") {
       ID.unique(),
       data
     );
-    console.log(response);
   } catch (error) {
+    console.error(error);
   } finally {
     return Astro.redirect("/admin/clients");
   }

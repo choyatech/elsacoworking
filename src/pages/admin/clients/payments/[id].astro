@@ -20,12 +20,10 @@ try {
     import.meta.env.PUBLIC_APPWRITE_PAYMENTS,
     [Query.equal("client", id as string)]
   );
-  console.log(listOfPayments);
 
   payments = listOfPayments;
 } catch (error) {
-  console.log(error);
-
+  console.error(error);
   return Astro.redirect(`/admin/clients/${id}`);
 }
 ---
