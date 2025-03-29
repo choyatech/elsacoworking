@@ -1,12 +1,11 @@
 import { Editor } from "primereact/editor";
 import { useState } from "react";
 
-export const CustomEditor = () => {
-  const [text, setText] = useState("");
+export const CustomEditor = ({ setContent, content }: any) => {
   return (
     <Editor
-      value={text}
-      onTextChange={e => setText(e.htmlValue as string)}
+      value={content}
+      onTextChange={e => setContent(e.htmlValue as string)}
       style={{ height: "320px" }}
     />
   );
