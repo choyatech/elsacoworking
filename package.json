@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.2.3",
+    "@astrojs/netlify": "^6.2.3",
     "@astrojs/node": "^9.1.2",
     "@astrojs/react": "^4.2.1",
     "@astrojs/tailwind": "^6.0.0",
@@ -58,6 +59,8 @@
     "motion": "^12.2.0",
     "node-appwrite": "^15.0.0",
     "novel": "^1.0.2",
+    "primereact": "^10.9.3",
+    "quill": "^2.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-fast-marquee": "^1.6.5",

@@ -1,0 +1,19 @@
+---
+import Layout from "@/src/core/Layout.astro";
+import { databases } from "@/src/lib/appwrite";
+import { TODO } from "./_components/TODO";
+import { Query } from "node-appwrite";
+
+const { documents: tasks } = await databases.listDocuments(
+  import.meta.env.PUBLIC_APPWRITE_DB,
+  import.meta.env.PUBLIC_APPWRITE_TASKS,
+  [Query.orderDesc("$createdAt")]
+);
+---
+
+<Layout>
+  <main class="md:w-1/3 py-6 h-full mx-auto cursor-pointer select-none">
+    <h1 class="text-4xl text-center">Tareas</h1>
+    <TODO tasks={tasks} client:load />
+  </main>
+</Layout>

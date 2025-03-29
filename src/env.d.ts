@@ -11,6 +11,10 @@ interface ImportMetaEnv {
   readonly PUBLIC_EMAIL_USER_ID: string;
   readonly PUBLIC_APPWRITE_STORAGE: string;
   readonly PUBLIC_APPWRITE_EVENTS: string;
+  readonly PUBLIC_APPWRITE_TASKS: string;
+  readonly PUBLIC_APPWRITE_STORAGE_PAYMENTS: string;
+  readonly PUBLIC_APPWRITE_PAYMENTS: string;
+  readonly PUBLIC_APPWRITE_NOTIFICATIONS: string;
 }
 
 interface ImportMeta {

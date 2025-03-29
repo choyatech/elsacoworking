@@ -46,7 +46,7 @@ if (Astro.request.method === "POST") {
     const allFiles = [...existingFiles, ...fileIds];
 
     // Actualizar documento con todos los files
-    const result = await databases.updateDocument(
+    await databases.updateDocument(
       import.meta.env.PUBLIC_APPWRITE_DB,
       import.meta.env.PUBLIC_APPWRITE_CLIENTS,
       id as string,

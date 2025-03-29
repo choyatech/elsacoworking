@@ -1,9 +1,7 @@
 import { useState, type SyntheticEvent } from "react";
 import { ID } from "appwrite";
-import { Button } from "../core/components/button";
 import { databases } from "../lib/appwrite";
-import { Editor } from "@/src/blog/Editor";
-import { marked } from "marked";
+import { CustomEditor } from "@/src/blog/Editor";
 
 export const FormPost = () => {
   const [content, setContent] = useState<string>("");
@@ -24,8 +22,6 @@ export const FormPost = () => {
       description: { value: string };
     };
 
-    const _content = await marked.parse(content);
-
     const results = await databases.createDocument(
       import.meta.env.PUBLIC_APPWRITE_DB,
       import.meta.env.PUBLIC_APPWRITE_POSTS,
@@ -34,7 +30,7 @@ export const FormPost = () => {
         title: target.title.value,
         slug: target.slug.value,
         description: target.description.value,
-        content: _content,
+        content,
       }
     );
 
@@ -47,7 +43,7 @@ export const FormPost = () => {
   return (
     <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-6">
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-white">
+        <label htmlFor="title" className="block text-sm font-medium ">
           Título
         </label>
         <input
@@ -72,10 +68,7 @@ export const FormPost = () => {
         />
       </div>
       <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-white"
-        >
+        <label htmlFor="description" className="block text-sm font-medium ">
           Descripción
         </label>
         <input
@@ -88,15 +81,10 @@ export const FormPost = () => {
         />
       </div>
       <div>
-        <label
-          htmlFor="content"
-          className="block text-sm font-medium text-white"
-        >
+        <label htmlFor="content" className="block text-sm font-medium ">
           Contenido
         </label>
-        <div className="mt-1  block w-full border-gray-200 rounded-lg text-sm  disabled:opacity-50 disabled:pointer-events-none  border border-gray focus:outline-none px-12 py-4">
-          <Editor setContent={setContent} />
-        </div>
+        <CustomEditor setContent={setContent} content={content} />
       </div>
 
       <div className="flex justify-center">

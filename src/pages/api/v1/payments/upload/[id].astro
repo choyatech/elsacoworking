@@ -1,0 +1,56 @@
+---
+import { storage, databases } from "@/src/lib/appwrite";
+import { ID } from "node-appwrite";
+
+const { id } = Astro.params;
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+
+  const description = formData.get("description") as string;
+  const files = formData.getAll("files");
+
+  // Verificar si hay archivos válidos
+  const validFiles = files.filter(
+    file => file instanceof File && file.size > 0
+  );
+
+  if (validFiles.length === 0) {
+    return Astro.redirect(`/admin/clients/payments/${id}?error=no-files`);
+  }
+
+  try {
+    const fileId = await storage.createFile(
+      import.meta.env.PUBLIC_APPWRITE_STORAGE,
+      ID.unique(),
+      validFiles[0] as File
+    );
+
+    if (fileId) {
+      await databases.createDocument(
+        import.meta.env.PUBLIC_APPWRITE_DB,
+        import.meta.env.PUBLIC_APPWRITE_PAYMENTS,
+        ID.unique(),
+        {
+          client: id,
+          description: description,
+          image: fileId.$id,
+        }
+      );
+    }
+
+    await databases.updateDocument(
+      import.meta.env.PUBLIC_APPWRITE_DB,
+      import.meta.env.PUBLIC_APPWRITE_CLIENTS,
+      id as string,
+      {
+        lastPayment: new Date().toISOString(),
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    return Astro.redirect(`/admin/clients/payments/${id}?error=upload-failed`);
+  }
+  return Astro.redirect(`/admin/clients/payments/${id}?success=true`);
+}
+---
