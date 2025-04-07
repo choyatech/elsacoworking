@@ -11,12 +11,7 @@ const { user } = Astro.locals;
 const { isDarkMode = false } = Astro.props;
 ---
 
-<!--
-  Añade el atributo "x-data" de AlpineJS en el <header> para manejar el estado de apertura del menú
-  en móvil (open = false cerrado, true abierto).
--->
 <header
-  x-data="{ open: false }"
   class={`w-full py-4 px-6 transition-colors duration-300 ${
     !isDarkMode
       ? "bg-gray-900 text-white"
@@ -34,18 +29,13 @@ const { isDarkMode = false } = Astro.props;
     </a>
 
     <!-- BOTÓN HAMBURGER (visible solo en móviles) -->
-    <button
-      class={`md:hidden p-2 rounded-lg transition-colors ${
-        isDarkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
-      }`}
-      @click="open = !open"
+    <label
+      for="drawer-toggle"
+      class="md:hidden p-2 rounded-lg transition-colors hover:bg-gray-800 cursor-pointer"
       aria-label="Abrir menú de navegación"
     >
-      <svg class="h-6 w-6 fill-current" viewBox="0 0 24 24">
-        <path x-show="!open" d="M4 6h16M4 12h16M4 18h16"></path>
-        <path x-show="open" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
+      <i class="fa fa-bars"></i>
+    </label>
 
     <!-- NAVEGACIÓN (oculta en móvil, visible en desktop) -->
     <nav aria-label="Menú principal" class="hidden md:block">
@@ -93,60 +83,49 @@ const { isDarkMode = false } = Astro.props;
       </ul>
     </nav>
   </div>
-
-  <!-- MENÚ DESPLEGABLE EN MÓVIL -->
-  <!-- <div
-    class={`md:hidden absolute left-0 right-0 shadow-lg w-full ${
-      isDarkMode ? "bg-gray-900" : "bg-white"
-    }`}
-    x-show="open"
-    @click.outside="open = false"
-    x-transition:enter="transition transform origin-top ease-out duration-200"
-    x-transition:enter-start="opacity-0 scale-y-90"
-    x-transition:enter-end="opacity-100 scale-y-100"
-    x-transition:leave="transition transform origin-top ease-in duration-100"
-    x-transition:leave-start="opacity-100 scale-y-100"
-    x-transition:leave-end="opacity-0 scale-y-90"
-  >
-    <nav aria-label="Menú principal móvil" class="p-6">
-      <ul class="flex flex-col gap-6 text-center">
-        <li>
-          <a href="/" class="block py-2 hover:text-primary transition-colors"
-            >Inicio</a
-          >
-        </li>
-        <li>
-          <a
-            href="/sobre-nosotros"
-            class="block py-2 hover:text-primary transition-colors"
-            >Sobre Nosotros</a
-          >
-        </li>
-        <li>
-          <a
-            href="/servicios"
-            class="block py-2 hover:text-primary transition-colors">Servicios</a
-          >
-        </li>
-        <li>
-          <a
-            href="/blog"
-            class="block py-2 hover:text-primary transition-colors">Blog</a
-          >
-        </li>
-        {
-          user ? (
-            <li>
-              <a
-                href="/admin"
-                class="block py-2 hover:text-primary transition-colors"
-              >
-                Admin
-              </a>
-            </li>
-          ) : null
-        }
-      </ul>
-    </nav>
-  </div> -->
 </header>
+
+<!-- Input que controla el drawer -->
+<input type="checkbox" id="drawer-toggle" class="peer hidden" />
+
+<!-- Drawer lateral -->
+<div
+  class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white shadow-lg transform -translate-x-full peer-checked:translate-x-0 transition-transform duration-300 z-40"
+>
+  <div class="p-4 border-b font-bold text-lg">Menú</div>
+  <ul class="p-4 space-y-2">
+    <li>
+      <a href="/" class="block hover:text-primary transition-colors">Inicio</a>
+    </li>
+    <li>
+      <a
+        href="/es/sobre-nosotros"
+        class="block hover:text-primary transition-colors">Sobre Nosotros</a
+      >
+    </li>
+    <li>
+      <a href="/es/servicios" class="block hover:text-primary transition-colors"
+        >Servicios</a
+      >
+    </li>
+    <li>
+      <a href="/blog" class="block hover:text-primary transition-colors">Blog</a
+      >
+    </li>
+    {
+      user ? (
+        <li>
+          <a href="/admin" class="block hover:text-primary transition-colors">
+            Admin
+          </a>
+        </li>
+      ) : null
+    }
+  </ul>
+</div>
+
+<!-- Fondo oscuro cuando el drawer está abierto -->
+<label
+  for="drawer-toggle"
+  class="peer-checked:block hidden fixed inset-0 bg-black bg-opacity-40 z-30 cursor-pointer"
+></label>
