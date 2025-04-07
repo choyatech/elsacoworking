@@ -308,6 +308,16 @@ export default function Calendar() {
                       </option>
                     ))}
                   </select>
+                  <datalist id="">
+                    {clients.map(client => (
+                      <option
+                        key={client.$id}
+                        value={`${client.name} ${client.lastname}`}
+                      >
+                        {`${client.name} ${client.lastname}`}
+                      </option>
+                    ))}
+                  </datalist>
                   <label className="block text-sm text-gray-700 mt-3">
                     Hora de la cita
                   </label>
